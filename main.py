@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+app = FastAPI(title="Relic Crafts API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,11 +14,23 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello from FastAPI Backend!"}
+    return {"message": "Relic Crafts Backend"}
 
 @app.get("/api/hello")
 def hello():
     return {"message": "Hello from the backend API!"}
+
+@app.get("/status")
+def status():
+    """Lightweight status endpoint used by the landing page.
+    Returns ok=True when backend is running. In the future this can be
+    extended to check game server reachability.
+    """
+    return {
+        "ok": True,
+        "service": "backend",
+        "env": "production" if os.getenv("ENV") == "production" else "development",
+    }
 
 @app.get("/test")
 def test_database():
@@ -58,7 +70,6 @@ def test_database():
         response["database"] = f"❌ Error: {str(e)[:50]}"
     
     # Check environment variables
-    import os
     response["database_url"] = "✅ Set" if os.getenv("DATABASE_URL") else "❌ Not Set"
     response["database_name"] = "✅ Set" if os.getenv("DATABASE_NAME") else "❌ Not Set"
     
